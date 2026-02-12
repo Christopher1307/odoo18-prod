@@ -11,11 +11,9 @@ services:
       - "8069:8069"
     volumes:
       - odoo-web-data:/var/lib/odoo
-      # ✅ Montaje correcto en Dokploy: ruta ABSOLUTA al repo clonado en el host
       - /etc/dokploy/compose/odoo-community-odoo18-uszjhu/code/extra-addons/server-tools:/mnt/extra-addons
-      - /etc/dokploy/compose/odoo-community-odoo18-uszjhu/code/odoo.conf:/etc/odoo/odoo.conf
     command: >
-      odoo --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons
+      odoo --db_host=db --db_user=odoo --db_password=odoo --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons
 
   db:
     image: postgres:17
