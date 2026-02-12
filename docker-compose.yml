@@ -12,8 +12,10 @@ services:
       --db_host=db
       --db_user=odoo
       --db_password=odoo
-      --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/var/lib/odoo/addons/18.0,/mnt/extra-addons/server-tools
+      --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/server-tools
 
+
+    
   db:
     image: postgres:17
     environment:
