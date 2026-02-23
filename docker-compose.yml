@@ -16,6 +16,8 @@ services:
       - odoo
       - -c
       - /etc/odoo/odoo.conf
+      - -u
+      - base_fontawesome,base_fontawesome_web_editor
       - --db_host=db
       - --db_user=odoo
       - --db_password=odoo
