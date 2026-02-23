@@ -10,15 +10,17 @@ services:
     ports:
       - "8069:8069"
     volumes:
-      - ./extra-addons:/mnt/extra-addons
+      - .:/opt/odoo/workspace
       - ./config:/etc/odoo
       - odoo-web-data:/var/lib/odoo
     command:
       - odoo
+      - -c
+      - /etc/odoo/odoo.conf
       - --db_host=db
       - --db_user=odoo
       - --db_password=odoo
-      - --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/server-tools,/mnt/extra-addons/web-18.0
+      - --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/opt/odoo/workspace/extra-addons/server-tools,/opt/odoo/workspace/extra-addons/web-18.0
   db:
     image: postgres:17
     environment:
