@@ -10,7 +10,7 @@ services:
     ports:
       - "8069:8069"
     volumes:
-      - .:/mnt/extra-addons
+      - ./extra-addons:/mnt/extra-addons
       - odoo-web-data:/var/lib/odoo
     command: >
       odoo
