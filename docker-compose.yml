@@ -22,7 +22,7 @@ services:
       - --db_password=odoo
       - --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/server-tools,/mnt/extra-addons/web-18.0,/mnt/extra-addons/dms,/mnt/extra-addons/custom
   db:
-    image: postgres:16
+    image: postgres:17
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=odoo
@@ -32,8 +32,4 @@ services:
 
 volumes:
   odoo-web-data:
-    external: true
-    name: filestore
   odoo-db-data:
-    external: true
-    name: "339c32e8eb4bf5f86bb159a8271110a9c98cfc3f687860097ad7f1d393097e10"
