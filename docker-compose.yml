@@ -14,7 +14,6 @@ services:
       - odoo
       - -c
       - /etc/odoo/odoo.conf
-
       - --db_host=odoo-community-hub-ufd0dz
       - --db_user=odoo
       - --db_password=5edw5jsxgauc0lto
