@@ -18,7 +18,7 @@ services:
       - --db_host=odoo-community-hub-ufd0dz
       - --db_user=odoo
       - --db_password=5edw5jsxgauc0lto
-      - --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/server-tools,/mnt/extra-addons/web-19.0,/mnt/extra-addons/dms,/mnt/extra-addons/custom
+      - --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/server-tools,/mnt/extra-addons/web-18.0,/mnt/extra-addons/dms,/mnt/extra-addons/custom
 
 volumes:
   odoo-web-data:
