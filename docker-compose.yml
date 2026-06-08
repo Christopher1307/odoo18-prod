@@ -4,7 +4,7 @@ services:
     environment:
       - HOST=odoo-community-hub-ufd0dz
       - USER=odoo
-      - PASSWORD=5edw5jsxgauc0lto
+      - PASSWORD=5edw5jsxgauc0ito
     ports:
       - "8069:8069"
     volumes:
@@ -16,7 +16,7 @@ services:
       - /etc/odoo/odoo.conf
       - --db_host=odoo-community-hub-ufd0dz
       - --db_user=odoo
-      - --db_password=5edw5jsxgauc0lto
+      - --db_password=5edw5jsxgauc0ito
       - --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/server-tools,/mnt/extra-addons/web-18.0,/mnt/extra-addons/dms,/mnt/extra-addons/custom
 
 volumes:
