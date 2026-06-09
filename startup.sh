@@ -1,16 +1,18 @@
 #!/bin/bash
 set -e
 
-CONFIG="/etc/odoo/odoo.conf"
+echo "=== Odoo Startup ==="
 
+# Variables de conexión dinámicas
 DB_HOST=${HOST:-"odoo-community-hub-ufd0dz"}
 DB_USER=${USER:-"odoo"}
 DB_PASSWORD=${PASSWORD:-"5edw5jsxgauc0ito"}
 DB_NAME="odoo"
 
-echo "=== Odoo Startup ==="
+# Ruta explícita de tus Addons
+ADDONS_PATH="/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/server-tools,/mnt/extra-addons/web-18.0,/mnt/extra-addons/dms,/mnt/extra-addons/custom"
 
-# 1. Esperar a que PostgreSQL esté realmente disponible
+# 1. Esperar a que PostgreSQL esté realmente disponible en la red
 echo "Waiting for PostgreSQL to be ready at $DB_HOST:5432..."
 until python3 -c "
 import psycopg2, sys
@@ -39,18 +41,18 @@ try:
     conn.close()
     print('TRUE' if result else 'FALSE')
 except Exception as e:
-    # Si la base de datos 'odoo' ni siquiera existe en Postgres, devolvemos FALSE para crearla
     print('FALSE')
 ")
 
-# 3. Tomar acción según el resultado real
+# 3. Ejecución forzando los parámetros por comando (Ignorando el odoo.conf problemático)
 if [ "$DB_EXISTS" = "TRUE" ]; then
     echo "Database already initialized, skipping init."
 else
-    echo "Database not initialized or empty. Running --init=base (may take a few minutes)..."
-    odoo -c "$CONFIG" --init=base --stop-after-init
+    echo "Database not initialized or empty. Running --init=base..."
+    odoo --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --init=base --stop-after-init
     echo "Database initialization complete."
 fi
 
 echo "Starting Odoo server..."
-exec odoo -c "$CONFIG"
+# Ejecución limpia con banderas explícitas y modo proxy activado para Dokploy
+exec odoo --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --data-dir=/var/lib/odoo --proxy-mode
