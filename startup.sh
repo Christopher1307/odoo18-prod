@@ -9,7 +9,7 @@ DB_USER=${USER:-"odoo"}
 DB_PASSWORD=${PASSWORD:-"5edw5jsxgauc0ito"}
 DB_NAME="odoo"
 
-# Ruta explícita de tus Addons
+# Ruta de tus Addons
 ADDONS_PATH="/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/server-tools,/mnt/extra-addons/web-18.0,/mnt/extra-addons/dms,/mnt/extra-addons/custom"
 
 # 1. Esperar a que PostgreSQL esté realmente disponible en la red
@@ -30,7 +30,7 @@ done
 echo "PostgreSQL is up and running!"
 echo "Checking database initialization..."
 
-# 2. Verificar de manera segura si la tabla 'base' existe
+# 2. Verificar de manera segura si la tabla 'base' existe en la base de datos objetivo
 DB_EXISTS=$(python3 -c "
 import psycopg2, sys
 try:
@@ -44,15 +44,16 @@ except Exception as e:
     print('FALSE')
 ")
 
-# 3. Ejecución forzando los parámetros por comando (Ignorando el odoo.conf problemático)
+# 3. Ejecución corrigiendo el parámetro del nombre de la base de datos (-d)
 if [ "$DB_EXISTS" = "TRUE" ]; then
     echo "Database already initialized, skipping init."
 else
-    echo "Database not initialized or empty. Running --init=base..."
-    odoo --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --init=base --stop-after-init
+    echo "Database not initialized or empty. Running --init=base on database '$DB_NAME'..."
+    # AGREGADO: -d "$DB_NAME" para decirle exactamente dónde instalar todo
+    odoo -d "$DB_NAME" --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --init=base --stop-after-init
     echo "Database initialization complete."
 fi
 
 echo "Starting Odoo server..."
-# Ejecución limpia con banderas explícitas y modo proxy activado para Dokploy
-exec odoo --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --data-dir=/var/lib/odoo --proxy-mode
+# AGREGADO: -d "$DB_NAME" para que el servidor apunte directamente a tu entorno de producción
+exec odoo -d "$DB_NAME" --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --data-dir=/var/lib/odoo --proxy-mode
