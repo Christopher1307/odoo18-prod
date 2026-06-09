@@ -12,6 +12,12 @@ DB_NAME="odoo"
 # Ruta de tus Addons
 ADDONS_PATH="/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/server-tools,/mnt/extra-addons/web-18.0,/mnt/extra-addons/dms,/mnt/extra-addons/custom"
 
+# =====================================================================
+#  TU CONTRASEÑA MAESTRA FORZADA
+#  Puedes dejar "admin" para probar ahora, pero cámbiala luego por seguridad
+# =====================================================================
+MASTER_PASS="admin"
+
 # 1. Esperar a que PostgreSQL esté realmente disponible en la red
 echo "Waiting for PostgreSQL to be ready at $DB_HOST:5432..."
 until python3 -c "
@@ -44,19 +50,17 @@ except Exception as e:
     print('FALSE')
 ")
 
-# 3. Inicialización (Aquí SÍ dejamos -d porque inicializamos la base de datos por defecto 'odoo')
+# 3. Inicialización (Se añade la bandera --admin-passwd)
 if [ "$DB_EXISTS" = "TRUE" ]; then
     echo "Database already initialized, skipping init."
 else
     echo "Database not initialized or empty. Running --init=base on database '$DB_NAME'..."
-    odoo -d "$DB_NAME" --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --init=base --stop-after-init
+    odoo -d "$DB_NAME" --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --init=base --stop-after-init --admin-passwd="$MASTER_PASS"
     echo "Database initialization complete."
 fi
 
 echo "Starting Odoo server..."
 # =====================================================================
-# CAMBIO CRÍTICO: Eliminamos -d "$DB_NAME" de la línea de abajo.
-# Al quitarlo, el "dbfilter" se abre y te dejará gestionar, crear y 
-# loguearte en CUALQUIER base de datos que tengas en tu Postgres.
+# INYECCIÓN DEFINITIVA: Forzamos a Odoo a usar tu MASTER_PASS en la web
 # =====================================================================
-exec odoo --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --data-dir=/var/lib/odoo --proxy-mode
+exec odoo --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --data-dir=/var/lib/odoo --proxy-mode --admin-passwd="$MASTER_PASS"
