@@ -1,17 +1,18 @@
 services:
   web:
     build: .
+    restart: unless-stopped
+    # Inyectamos las variables nativas que Odoo lee automáticamente al arrancar
     environment:
       - HOST=odoo-community-hub-ufd0dz
       - USER=odoo
       - PASSWORD=5edw5jsxgauc0ito
+      - DB_HOST=odoo-community-hub-ufd0dz
+      - DB_USER=odoo
+      - DB_PASSWORD=5edw5jsxgauc0ito
+      - DB_PORT=5432
     ports:
       - "8069:8069"
     volumes:
       - ./config:/etc/odoo
       - odoo-web-data:/var/lib/odoo
-    # ¡QUITAMOS EL ARRASTRE DEL COMMAND DE AQUÍat!
-    # El ENTRYPOINT del Dockerfile se encargará de ejecutar /startup.sh
-
-volumes:
-  odoo-web-data:
