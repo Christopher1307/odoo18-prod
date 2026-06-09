@@ -30,7 +30,7 @@ done
 echo "PostgreSQL is up and running!"
 echo "Checking database initialization..."
 
-# 2. Verificar de manera segura si la tabla 'base' existe en la base de datos objetivo
+# 2. Verificar de manera segura si la tabla 'base' existe en la base de datos principal
 DB_EXISTS=$(python3 -c "
 import psycopg2, sys
 try:
@@ -44,16 +44,19 @@ except Exception as e:
     print('FALSE')
 ")
 
-# 3. Ejecución corrigiendo el parámetro del nombre de la base de datos (-d)
+# 3. Inicialización (Aquí SÍ dejamos -d porque inicializamos la base de datos por defecto 'odoo')
 if [ "$DB_EXISTS" = "TRUE" ]; then
     echo "Database already initialized, skipping init."
 else
     echo "Database not initialized or empty. Running --init=base on database '$DB_NAME'..."
-    # AGREGADO: -d "$DB_NAME" para decirle exactamente dónde instalar todo
     odoo -d "$DB_NAME" --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --init=base --stop-after-init
     echo "Database initialization complete."
 fi
 
 echo "Starting Odoo server..."
-# AGREGADO: -d "$DB_NAME" para que el servidor apunte directamente a tu entorno de producción
-exec odoo -d "$DB_NAME" --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --data-dir=/var/lib/odoo --proxy-mode
+# =====================================================================
+# CAMBIO CRÍTICO: Eliminamos -d "$DB_NAME" de la línea de abajo.
+# Al quitarlo, el "dbfilter" se abre y te dejará gestionar, crear y 
+# loguearte en CUALQUIER base de datos que tengas en tu Postgres.
+# =====================================================================
+exec odoo --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --data-dir=/var/lib/odoo --proxy-mode
