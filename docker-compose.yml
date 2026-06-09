@@ -10,15 +10,8 @@ services:
     volumes:
       - ./config:/etc/odoo
       - odoo-web-data:/var/lib/odoo
-    command:
-      - odoo
-      - -c
-      - /etc/odoo/odoo.conf
-      - --db_host=odoo-community-hub-ufd0dz
-      - --db_user=odoo
-      - --db_password=5edw5jsxgauc0ito
-      - --addons-path=/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/server-tools,/mnt/extra-addons/web-18.0,/mnt/extra-addons/dms,/mnt/extra-addons/custom
-      - --init=base
+    # ¡QUITAMOS EL ARRASTRE DEL COMMAND DE AQUÍat!
+    # El ENTRYPOINT del Dockerfile se encargará de ejecutar /startup.sh
 
 volumes:
   odoo-web-data:
