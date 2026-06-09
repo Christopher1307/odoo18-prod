@@ -13,10 +13,10 @@ DB_NAME="odoo"
 ADDONS_PATH="/usr/lib/python3/dist-packages/odoo/addons,/mnt/extra-addons/server-tools,/mnt/extra-addons/web-18.0,/mnt/extra-addons/dms,/mnt/extra-addons/custom"
 
 # =====================================================================
-#  TU CONTRASEÑA MAESTRA FORZADA
-#  Puedes dejar "admin" para probar ahora, pero cámbiala luego por seguridad
+#  TU CONTRASEÑA MAESTRA NATIVA (Odoo 18)
+#  Exportamos como ODOO_ADMIN_PASSWD para que Odoo la detecte solo
 # =====================================================================
-MASTER_PASS="admin"
+export ODOO_ADMIN_PASSWD="admin"
 
 # 1. Esperar a que PostgreSQL esté realmente disponible en la red
 echo "Waiting for PostgreSQL to be ready at $DB_HOST:5432..."
@@ -36,7 +36,7 @@ done
 echo "PostgreSQL is up and running!"
 echo "Checking database initialization..."
 
-# 2. Verificar de manera segura si la tabla 'base' existe en la base de datos principal
+# 2. Verificar de manera segura si la tabla 'base' existe
 DB_EXISTS=$(python3 -c "
 import psycopg2, sys
 try:
@@ -50,17 +50,15 @@ except Exception as e:
     print('FALSE')
 ")
 
-# 3. Inicialización (Se añade la bandera --admin-passwd)
+# 3. Inicialización (Quitamos la bandera prohibida --admin-passwd)
 if [ "$DB_EXISTS" = "TRUE" ]; then
     echo "Database already initialized, skipping init."
 else
     echo "Database not initialized or empty. Running --init=base on database '$DB_NAME'..."
-    odoo -d "$DB_NAME" --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --init=base --stop-after-init --admin-passwd="$MASTER_PASS"
+    odoo -d "$DB_NAME" --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --init=base --stop-after-init
     echo "Database initialization complete."
 fi
 
 echo "Starting Odoo server..."
-# =====================================================================
-# INYECCIÓN DEFINITIVA: Forzamos a Odoo a usar tu MASTER_PASS en la web
-# =====================================================================
-exec odoo --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --data-dir=/var/lib/odoo --proxy-mode --admin-passwd="$MASTER_PASS"
+# Exec limpio sin la bandera obsoleta
+exec odoo --db_host="$DB_HOST" --db_user="$DB_USER" --db_password="$DB_PASSWORD" --addons-path="$ADDONS_PATH" --data-dir=/var/lib/odoo --proxy-mode
