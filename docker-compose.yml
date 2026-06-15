@@ -16,3 +16,6 @@ services:
     volumes:
       - ./config:/etc/odoo
       - odoo-web-data:/var/lib/odoo
+
+volumes:
+  odoo-web-data:
